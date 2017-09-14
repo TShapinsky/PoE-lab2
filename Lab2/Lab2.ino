@@ -3,8 +3,8 @@
 #define YAW_PIN tbd
 
 
-int pitch = 0;
-int yaw = 0;
+int pitch = 1<<(ORDER-1);
+int yaw = 1<<(ORDER-1);
 byte dir = 0;
 char A[] = "-BF+AFA+FB-";
 char B[] = "+AF-BFB-FA+";
@@ -31,8 +31,8 @@ void reportData(){
 }
 
 void goto(int pitch, int yaw){
-  pitchServo.writeMircoseconds(pitch, 0, 255, 800, 2200);
-  yawServo.writeMircoseconds(yaw, 0, 255, 800, 2200);
+  pitchServo.writeMircoseconds(pitch, 0, 1<<ORDER - 1, 800, 2200);
+  yawServo.writeMircoseconds(yaw, 0, 1<<ORDER - 1, 800, 2200);
   delay(10);
 }
 
@@ -47,7 +47,7 @@ void curve(int n, char path[]){
         break;
       case 'B':
         if(n > 0){
-          curve(n-1, 'B');
+          curve(n-1, B);
         }
         break;
       case 'F':
