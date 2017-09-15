@@ -1,20 +1,26 @@
-#define ORDER 8
-#define PITCH_PIN tbd
-#define YAW_PIN tbd
+#include <Servo.h>
+
+#define ORDER 6
+#define PITCH_PIN 5
+#define YAW_PIN 3
+#define DEPTH_PIN A0
 
 
-int pitch = 1<<(ORDER-1);
-int yaw = 1<<(ORDER-1);
+int pitch = 0;//1<<(ORDER-1);
+int yaw = 0;//1<<(ORDER-1);
 byte dir = 0;
 char A[] = "-BF+AFA+FB-";
 char B[] = "+AF-BFB-FA+";
 Servo pitchServo;
 Servo yawServo;
+
+void curve(int n, char path[]);
 void setup() {
   Serial.begin(115200);
   pitchServo.attach(PITCH_PIN);
   yawServo.attach(YAW_PIN);
   curve(ORDER, A);
+  pinMode(DEPTH_PIN, INPUT);
 }
 
 void loop() {
@@ -22,22 +28,31 @@ void loop() {
 }
 
 void reportData(){
-  int value = 0;
+  int value = analogRead(DEPTH_PIN);
+  Serial.print("[");
   Serial.print(pitch);
-  Serial.print(",");
+  Serial.print(";");
   Serial.print(yaw);
-  Serial.print(":");
-  Serial.println(value);
+  Serial.print(";");
+  Serial.print(value);
+  Serial.println("]");
 }
 
-void goto(int pitch, int yaw){
-  pitchServo.writeMircoseconds(pitch, 0, 1<<ORDER - 1, 800, 2200);
-  yawServo.writeMircoseconds(yaw, 0, 1<<ORDER - 1, 800, 2200);
+void gotoPoint(int pitch, int yaw){
+  int pitchMicro = map(pitch, 0, 1<<(ORDER+2) - 1, 800, 2200);
+  int yawMicro = map(yaw, 0, 1<<(ORDER+2) - 1, 800, 2200);
+  /*Serial.print("[");
+  Serial.print(pitchMicro);
+  Serial.print(";");
+  Serial.print(yawMicro);
+  Serial.println("]");*/
+  pitchServo.writeMicroseconds(pitchMicro);
+  yawServo.writeMicroseconds(yawMicro);
   delay(10);
 }
 
 void curve(int n, char path[]){
-  for(int i = 0; i < sizeof(path); i++){
+  for(int i = 0; i < strlen(path); i++){
     char c = path[i];
     switch(c){
       case 'A':
@@ -57,7 +72,7 @@ void curve(int n, char path[]){
             pitch++;
           break;
           case 1:
-            yaw++
+            yaw++;
           break;
           case 2:
             pitch--;
@@ -66,7 +81,7 @@ void curve(int n, char path[]){
             yaw--;
           break;
         }
-        goto(pitch,yaw);
+        gotoPoint(pitch,yaw);
         reportData();
       break;
       case '-':
