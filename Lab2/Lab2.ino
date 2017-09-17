@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-#define ORDER 6
+#define ORDER 8
 #define PITCH_PIN 5
 #define YAW_PIN 3
 #define DEPTH_PIN A0
@@ -39,8 +39,8 @@ void reportData(){
 }
 
 void gotoPoint(int pitch, int yaw){
-  int pitchMicro = map(pitch, 0, 1<<(ORDER+2) - 1, 800, 2200);
-  int yawMicro = map(yaw, 0, 1<<(ORDER+2) - 1, 800, 2200);
+  int pitchMicro = map(pitch, 0, 1<<(ORDER+2) - 1, 1400, 2200);
+  int yawMicro = map(yaw, 0, 1<<(ORDER+2) - 1, 1200, 2000);
   /*Serial.print("[");
   Serial.print(pitchMicro);
   Serial.print(";");
