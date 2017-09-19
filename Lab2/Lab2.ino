@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-#define ORDER 8
+#define ORDER 6
 #define PITCH_PIN 5
 #define YAW_PIN 3
 #define DEPTH_PIN A0
@@ -38,7 +38,9 @@ void reportData(){
   Serial.println("]");
 }
 
-void gotoPoint(int pitch, int yaw){
+static int currentPitch, currentYaw;
+
+void gotoPoint_(int pitch, int yaw){
   int pitchMicro = map(pitch, 0, 1<<(ORDER+2) - 1, 1400, 2200);
   int yawMicro = map(yaw, 0, 1<<(ORDER+2) - 1, 1200, 2000);
   /*Serial.print("[");
@@ -48,7 +50,27 @@ void gotoPoint(int pitch, int yaw){
   Serial.println("]");*/
   pitchServo.writeMicroseconds(pitchMicro);
   yawServo.writeMicroseconds(yawMicro);
-  delay(10);
+  currentPitch = pitch;
+  currentYaw = yaw;
+  delay(30);
+}
+
+void gotoPoint(int pitch, int yaw) {
+  int dp, dy;
+  if(pitch > 0 && currentPitch > pitch) {
+    dp = -1;
+  } else {
+    dp = 1;
+  }
+  if(yaw > 0 && currentYaw > yaw) {
+    dy = -1;
+  } else {
+    dy = 0;
+  }
+  if(dp != 0 || dy != 0) {
+    gotoPoint_(pitch+dp,yaw+dy);
+  }
+  gotoPoint_(pitch,yaw);
 }
 
 void curve(int n, char path[]){
