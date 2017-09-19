@@ -1,5 +1,5 @@
 pause on
-arduino = serial('COM9', 'BAUD', 115200);
+arduino = serial('COM6', 'BAUD', 115200);
 fopen(arduino);
 fprintf(arduino,'hi');
 disp('sending');
